@@ -98,7 +98,7 @@ def main():
                 st.success("Agent ready.")
 
     # Chat area
-    st.subheader("Espa;o para discussão entre os usuários, caso desej chamar o agente, marque o com @colaborai na mensagem")
+    st.subheader("Espaço para discussão entre os usuários, caso deseje chamar o agente, marque o com @colaborai na mensagem")
     for msg in st.session_state.messages:
         author = msg.get("user", "User") if msg["role"] == "user" else "assistant"
         with st.chat_message("user" if msg["role"] == "user" else "assistant"):
@@ -115,7 +115,6 @@ def main():
             else:
                 with st.chat_message("assistant"):
                     with st.spinner("Thinking..."):
-                        # Use LC message dict format expected by the agent
                         result = st.session_state.agent.invoke({
                             "messages": [
                                 {"type": "human", "content": prompt.replace("@colaborai", "").strip()}
@@ -123,7 +122,7 @@ def main():
                         })
                         content = result["messages"][-1].content
                         st.markdown(content)
-                        st.session_state.messages.append({"role": "assistant", "content": content})
+                        st.session_state.messages.append({"role": "Assistant", "content": content})
 
     # st.divider()
     # st.subheader("Collaboration Simulation")

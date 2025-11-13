@@ -73,7 +73,9 @@ def build_agent(retriever, llm):
         for i, doc in enumerate(docs):
             results.append(f"Document {i+1}:\n{doc.page_content}")
         return "\n\n".join(results)
-
+    # Criar tool para trabalhar com o historico da conversa
+    # Criar tool para gerar questões novas
+    # Criar tool para gerar resumos
     tools = [retriever_tool]
     llm_with_tools = llm.bind_tools(tools)
 
