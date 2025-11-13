@@ -25,8 +25,17 @@ def build_llm(model: str = "nvidia/nemotron-nano-12b-v2-vl:free", temperature: f
     return llm
 
 def build_embeddings(embedding_model_name: str = "all-MiniLM-L6-v2"):
-    model = SentenceTransformer(embedding_model_name)
-    return model
+    class SentenceTransformerEmbeddings:
+        def __init__(self, model_name):
+            self.model = SentenceTransformer(model_name, device="cpu")
+
+        def embed_documents(self, texts):
+            return self.model.encode(texts, convert_to_tensor=False)
+
+        def embed_query(self, text):
+            return self.model.encode([text], convert_to_tensor=False)[0]
+
+    return SentenceTransformerEmbeddings(embedding_model_name)
 
 def load_pdf_pages(file_path: str):
     if not os.path.exists(file_path):

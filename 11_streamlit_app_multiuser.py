@@ -14,7 +14,7 @@ from agent_rag import (
     load_pdf_pages,
 )
 
-USERS = ["Moacir", "Bernardo", "Lourenço", "Maria"]
+USERS = ["Artur", "Pedro", "JP", "Rebecca", "John Doe"]
 
 def get_shared_vectorstore_dir() -> str:
     base = os.environ.get("RAG_VDB_DIR", "./vdb")
@@ -83,9 +83,6 @@ def main():
         # slider k
         k = st.slider("Retrieve k chunks", min_value=2, max_value=10, value=6, step=2)
 
-        # model selector
-        model = st.selectbox("LLM", ["gpt-4o-mini", "gpt-4o"], index=0)
-
         # slider temperature
         temp = st.slider("Model temperature", min_value=0.0, max_value=2.0, value=0.0, step=0.1)
 
@@ -94,14 +91,14 @@ def main():
             if st.session_state.retriever is None:
                 st.warning("Please build the index first")
             else:
-                llm = build_llm(model=model, temperature=temp)
+                llm = build_llm(temperature=temp)
                 retriever = st.session_state.retriever
                 retriever.search_kwargs["k"] = k
                 st.session_state.agent = build_agent(retriever, llm)
                 st.success("Agent ready.")
 
     # Chat area
-    st.subheader("Conversation (shared between users)")
+    st.subheader("Espa;o para discussão entre os usuários, caso desej chamar o agente, marque o com @colaborai na mensagem")
     for msg in st.session_state.messages:
         author = msg.get("user", "User") if msg["role"] == "user" else "assistant"
         with st.chat_message("user" if msg["role"] == "user" else "assistant"):
@@ -111,22 +108,22 @@ def main():
         st.session_state.messages.append({"user": st.session_state.selected_user, "role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(f"**{st.session_state.selected_user}**: {prompt}")
-
-        if st.session_state.agent is None:
-            with st.chat_message("assistant"):
-                st.warning("Create the agent in the sidebar before asking questions.")
-        else:
-            with st.chat_message("assistant"):
-                with st.spinner("Thinking..."):
-                    # Use LC message dict format expected by the agent
-                    result = st.session_state.agent.invoke({
-                        "messages": [
-                            {"type": "human", "content": prompt}
-                        ]
-                    })
-                    content = result["messages"][-1].content
-                    st.markdown(content)
-                    st.session_state.messages.append({"role": "assistant", "content": content})
+        if "@colaborai" in prompt.lower():
+            if st.session_state.agent is None:
+                with st.chat_message("assistant"):
+                    st.warning("Create the agent in the sidebar before asking questions.")
+            else:
+                with st.chat_message("assistant"):
+                    with st.spinner("Thinking..."):
+                        # Use LC message dict format expected by the agent
+                        result = st.session_state.agent.invoke({
+                            "messages": [
+                                {"type": "human", "content": prompt.replace("@colaborai", "").strip()}
+                            ]
+                        })
+                        content = result["messages"][-1].content
+                        st.markdown(content)
+                        st.session_state.messages.append({"role": "assistant", "content": content})
 
     # st.divider()
     # st.subheader("Collaboration Simulation")
