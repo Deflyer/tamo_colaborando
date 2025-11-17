@@ -15,7 +15,7 @@ from agent_rag import (
     load_vectorstore_from_persist,
 )
 
-USERS = ["Artur", "Pedro", "JP", "Rebecca", "John Doe"]
+USERS = ["Artur", "Pedro", "João", "Rebeca", "Lucas"]
 
 def get_shared_vectorstore_dir() -> str:
     base = os.environ.get("RAG_VDB_DIR", "./vdb")
